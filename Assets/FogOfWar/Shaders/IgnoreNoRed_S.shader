@@ -42,7 +42,7 @@ Shader "FreeGo/IgnoreNoRedShader"
             half4 frag (v2f i) : SV_Target
             {
                 half4 col = tex2D(_MainTex, i.uv);
-                if (col.r < 0.1) discard; // 忽略红色通道值小于0.1的部分
+                if (col.r < 1) discard; // 忽略红色通道值小于0.1的部分
                 return col;
             }
             ENDCG

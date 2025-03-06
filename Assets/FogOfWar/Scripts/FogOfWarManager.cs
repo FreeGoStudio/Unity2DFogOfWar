@@ -3,27 +3,27 @@ using UnityEngine.UI;
 
 public class FogOfWarManager : MonoBehaviour
 {
-    [SerializeField] private RenderTexture m_CameraOutput;
-    [SerializeField] private RawImage m_RawImage;
-    [SerializeField] private Material m_Material;
-    private RenderTexture m_Display;
+    [SerializeField] private RenderTexture m_PlayerViewCameraOutputRenderTexture;
+    [SerializeField] private RawImage m_FogOfWarMask;
+    [SerializeField] private Material m_BlitMaterial;
+    private RenderTexture m_FogOfWarMaskRenderTexture;
 
     void Start()
     {
-        m_Display = new RenderTexture(1024, 1024, 0);
-        m_Display.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_SNorm;
-        m_Display.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.None;
-        m_Display.filterMode = FilterMode.Point;
-        m_Display.dimension = UnityEngine.Rendering.TextureDimension.Tex2D;
+        m_FogOfWarMaskRenderTexture = new RenderTexture(1024, 1024, 0);
+        m_FogOfWarMaskRenderTexture.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_SNorm;
+        m_FogOfWarMaskRenderTexture.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.None;
+        m_FogOfWarMaskRenderTexture.filterMode = FilterMode.Bilinear;
+        m_FogOfWarMaskRenderTexture.dimension = UnityEngine.Rendering.TextureDimension.Tex2D;
 
-        m_Display.Create();
+        m_FogOfWarMaskRenderTexture.Create();
 
-        m_RawImage.gameObject.SetActive(true);
-        m_RawImage.texture = m_Display;
+        m_FogOfWarMask.gameObject.SetActive(true);
+        m_FogOfWarMask.texture = m_FogOfWarMaskRenderTexture;
     }
 
     void Update()
     {
-        Graphics.Blit(m_CameraOutput, m_Display, m_Material);
+        Graphics.Blit(m_PlayerViewCameraOutputRenderTexture, m_FogOfWarMaskRenderTexture, m_BlitMaterial);
     }
 }
