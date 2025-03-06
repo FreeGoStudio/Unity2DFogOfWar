@@ -11,7 +11,7 @@ public class FogOfWarManager : MonoBehaviour
     void Start()
     {
         m_Display = new RenderTexture(1024, 1024, 0);
-        m_Display.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm;
+        m_Display.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_SNorm;
         m_Display.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.None;
         m_Display.filterMode = FilterMode.Point;
         m_Display.dimension = UnityEngine.Rendering.TextureDimension.Tex2D;
