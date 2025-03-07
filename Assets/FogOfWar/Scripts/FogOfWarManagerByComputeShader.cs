@@ -15,7 +15,7 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
         m_FogOfWarMaskRenderTexture = new RenderTexture(1024, 1024, 0);
         m_FogOfWarMaskRenderTexture.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_SNorm;
         m_FogOfWarMaskRenderTexture.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.None;
-        m_FogOfWarMaskRenderTexture.filterMode = FilterMode.Point;
+        m_FogOfWarMaskRenderTexture.filterMode = FilterMode.Bilinear;
         m_FogOfWarMaskRenderTexture.dimension = UnityEngine.Rendering.TextureDimension.Tex2D;
         m_FogOfWarMaskRenderTexture.enableRandomWrite = true;
 
