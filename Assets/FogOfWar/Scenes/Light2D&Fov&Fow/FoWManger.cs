@@ -3,9 +3,8 @@ using UnityEngine.UI;
 
 public class FOWManger : MonoBehaviour
 {
-    [SerializeField] private GameObject m_Player;
-
     //FOV
+    [SerializeField] private GameObject m_FOVGameObject;
     [SerializeField] private Camera m_FOVCamera;
     [SerializeField] private float m_FOVCameraSize = 8f;
     [SerializeField] private int m_FOVCameraRenderTextureSize = 256;
@@ -24,7 +23,7 @@ public class FOWManger : MonoBehaviour
     private void Awake()
     {
         m_FOVCameraRenderTexture = new RenderTexture(m_FOVCameraRenderTextureSize, m_FOVCameraRenderTextureSize, 0);
-        m_FOVCameraRenderTexture.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R8_SNorm;
+        m_FOVCameraRenderTexture.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8_SNorm;
         m_FOVCameraRenderTexture.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.D16_UNorm;
         m_FOVCameraRenderTexture.filterMode = FilterMode.Point;
         m_FOVCameraRenderTexture.dimension = UnityEngine.Rendering.TextureDimension.Tex2D;
@@ -60,14 +59,14 @@ public class FOWManger : MonoBehaviour
     void Update()
     {
         // 获取角色的世界坐标
-        Vector3 playerWorldPos = m_Player.transform.position;
+        var worldPosition = m_FOVGameObject.transform.position;
 
         var FOVPixelsPerWorldUnit = m_FOVCameraRenderTextureSize / (m_FOVCameraSize * 2f);
 
         // 世界坐标转换成RenderTexture坐标, 1世界坐标=16像素
         Vector2Int renderTexturePos = new Vector2Int(
-            (int)(playerWorldPos.x * FOVPixelsPerWorldUnit),
-            (int)(playerWorldPos.y * FOVPixelsPerWorldUnit)
+            (int)(worldPosition.x * FOVPixelsPerWorldUnit),
+            (int)(worldPosition.y * FOVPixelsPerWorldUnit)
         );
 
         //坐标对齐到遮罩的中心

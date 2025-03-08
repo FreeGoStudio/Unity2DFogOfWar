@@ -19,6 +19,11 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float4 inputColor = Input[id.xy];
     float4 resultColor = Result[offsetID];
     
+    if (inputColor.r ==0 || inputColor.g ==0 )
+    {
+        return;
+    }
+    
     if (inputColor.r > resultColor.r)
     {
         resultColor.r = inputColor.r;
