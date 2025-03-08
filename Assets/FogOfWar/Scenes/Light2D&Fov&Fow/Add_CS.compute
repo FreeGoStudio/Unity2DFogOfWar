@@ -1,0 +1,18 @@
+#pragma kernel CSMain
+
+Texture2D<float4> Input;
+RWTexture2D<float4> Result;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float4 inputColor = Input[id.xy];
+    float4 resultColor = Result[id.xy];
+    
+    if (inputColor.r > resultColor.r)
+    {
+        resultColor.r = inputColor.r;
+    }
+    
+    Result[id.xy] = resultColor;
+}
