@@ -32,7 +32,7 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
 
     void Update()
     {
-
+        Debug.Log(m_CSMainKernelID);
         m_AddComputeShader.Dispatch(m_CSMainKernelID, m_PlayerViewCameraOutputRenderTexture.width / 8, m_PlayerViewCameraOutputRenderTexture.height / 8, 1);
     }
 }
