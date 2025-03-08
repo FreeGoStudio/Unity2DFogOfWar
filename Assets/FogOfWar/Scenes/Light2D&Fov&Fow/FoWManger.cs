@@ -40,6 +40,11 @@ public class FOWManger : MonoBehaviour
         m_FOWMaskRenderTexture.enableRandomWrite = true;
 
         m_FOWMaskRenderTexture.Create();
+
+        m_FOVAddFOWCSMainKernelID = m_AddFOVToFOWComputeShader.FindKernel("CSMain");
+
+        m_AddFOVToFOWComputeShader.SetTexture(m_FOVAddFOWCSMainKernelID, "Input", m_FOVCameraRenderTexture);
+        m_AddFOVToFOWComputeShader.SetTexture(m_FOVAddFOWCSMainKernelID, "Result", m_FOWMaskRenderTexture);
     }
 
     void Start()
@@ -53,10 +58,6 @@ public class FOWManger : MonoBehaviour
         m_FOWMask.gameObject.SetActive(true);
         m_FOWMask.texture = m_FOWMaskRenderTexture;
 
-        m_FOVAddFOWCSMainKernelID = m_AddFOVToFOWComputeShader.FindKernel("CSMain");
-
-        m_AddFOVToFOWComputeShader.SetTexture(m_FOVAddFOWCSMainKernelID, "Input", m_FOVCameraRenderTexture);
-        m_AddFOVToFOWComputeShader.SetTexture(m_FOVAddFOWCSMainKernelID, "Result", m_FOWMaskRenderTexture);
     }
 
     void Update()
