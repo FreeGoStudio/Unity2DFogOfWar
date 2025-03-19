@@ -2,17 +2,27 @@
 
 Texture2D<float4> Input;
 RWTexture2D<float4> Result;
+uint2 Offset;
 
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
+    uint2 offsetID = uint2(id.xy + Offset);
+    
+    uint width, height;
+    Result.GetDimensions(width, height);
+    if (offsetID.x >= width || offsetID.y >= height)
+    {
+        return;
+    }
+    
     float4 inputColor = Input[id.xy];
-    float4 resultColor = Result[id.xy];
+    float4 resultColor = Result[offsetID];
     
     if (inputColor.r > resultColor.r)
     {
         resultColor.r = inputColor.r;
     }
     
-    Result[id.xy] = resultColor;
+    Result[offsetID] = resultColor;
 }
