@@ -3,24 +3,35 @@ using UnityEngine.UI;
 
 public class FogOfWarManagerByComputeShader : MonoBehaviour
 {
+
+    [SerializeField] private Transform m_FOVTargetTransform;
     [SerializeField] private int m_PixelsPerWorldUnit = 16;
+    [SerializeField] private int m_FOVCameraSize = 4;
+    [SerializeField] private int m_FOWMaskSize = 128;
+
+    //Prefabs
+    [SerializeField] private GameObject m_PlayerViewPrefab;
+    [SerializeField] private GameObject m_PlayerViewCameraPrefab;
+    [SerializeField] private GameObject m_MaskCanvasPrefab;
+    [SerializeField] private ComputeShader m_FogOfWarAddComputeShader;
 
     //FOV
-    [SerializeField] private GameObject m_FOVGameObject;
-    [SerializeField] private Camera m_FOVCamera;
-    [SerializeField] private int m_FOVCameraSize = 8;
+    private GameObject m_FOVGameObject;
+    private Camera m_FOVCamera;
     private RenderTexture m_FOVCameraRenderTexture;
 
     //FOW
-    [SerializeField] private RawImage m_FOWMask;
-    [SerializeField] private int m_FOWMaskSize = 128;
+    private RawImage m_FOWMask;
     private RenderTexture m_FOWMaskRenderTexture;
 
-    [SerializeField] private ComputeShader m_AddFOVToFOWComputeShader;
     private int m_FOVAddFOWCSMainKernelID;
 
     private void Awake()
     {
+        m_FOVGameObject = CreateView();
+        m_FOVCamera = CreateCamera();
+        m_FOWMask = CreateMask();
+
         int FOVCameraRenderTextureSize = m_PixelsPerWorldUnit * m_FOVCameraSize * 2;
         m_FOVCameraRenderTexture = new RenderTexture(FOVCameraRenderTextureSize, FOVCameraRenderTextureSize, 0);
         m_FOVCameraRenderTexture.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8_SNorm;
@@ -40,10 +51,10 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
 
         m_FOWMaskRenderTexture.Create();
 
-        m_FOVAddFOWCSMainKernelID = m_AddFOVToFOWComputeShader.FindKernel("CSMain");
+        m_FOVAddFOWCSMainKernelID = m_FogOfWarAddComputeShader.FindKernel("CSMain");
 
-        m_AddFOVToFOWComputeShader.SetTexture(m_FOVAddFOWCSMainKernelID, "Input", m_FOVCameraRenderTexture);
-        m_AddFOVToFOWComputeShader.SetTexture(m_FOVAddFOWCSMainKernelID, "Result", m_FOWMaskRenderTexture);
+        m_FogOfWarAddComputeShader.SetTexture(m_FOVAddFOWCSMainKernelID, "Input", m_FOVCameraRenderTexture);
+        m_FogOfWarAddComputeShader.SetTexture(m_FOVAddFOWCSMainKernelID, "Result", m_FOWMaskRenderTexture);
     }
 
     void Start()
@@ -53,7 +64,7 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
         m_FOVCamera.orthographicSize = m_FOVCameraSize;
         m_FOVCamera.targetTexture = m_FOVCameraRenderTexture;
 
-        m_FOWMask.gameObject.SetActive(true);
+        //m_FOWMask.gameObject.SetActive(true);
         m_FOWMask.texture = m_FOWMaskRenderTexture;
     }
 
@@ -73,7 +84,31 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
 
 
         // 将纹理坐标传递给计算着色器
-        m_AddFOVToFOWComputeShader.SetInts("Offset", renderTexturePos.x + maskOffset, renderTexturePos.y + maskOffset);
-        m_AddFOVToFOWComputeShader.Dispatch(m_FOVAddFOWCSMainKernelID, m_FOVCameraRenderTexture.width / 8, m_FOVCameraRenderTexture.height / 8, 1);
+        m_FogOfWarAddComputeShader.SetInts("Offset", renderTexturePos.x + maskOffset, renderTexturePos.y + maskOffset);
+        m_FogOfWarAddComputeShader.Dispatch(m_FOVAddFOWCSMainKernelID, m_FOVCameraRenderTexture.width / 8, m_FOVCameraRenderTexture.height / 8, 1);
+    }
+
+    private GameObject CreateView()
+    {
+        var gameObject = Instantiate(m_PlayerViewPrefab);
+        gameObject.transform.SetParent(m_FOVTargetTransform);
+
+        return gameObject;
+    }
+
+    private Camera CreateCamera()
+    {
+        var gameObject = Instantiate(m_PlayerViewCameraPrefab);
+        gameObject.transform.SetParent(m_FOVTargetTransform);
+        var component = gameObject.GetComponent<Camera>();
+        return component;
+    }
+
+    private RawImage CreateMask()
+    {
+        var gameObject = Instantiate(m_MaskCanvasPrefab);
+        //获取GameObject的子物体中的RawImage组件
+        var component = gameObject.GetComponentInChildren<RawImage>();
+        return component;
     }
 }
