@@ -14,6 +14,7 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
     [SerializeField] private GameObject m_PlayerViewCameraPrefab;
     [SerializeField] private GameObject m_MaskCanvasPrefab;
     [SerializeField] private ComputeShader m_FogOfWarAddComputeShader;
+    [SerializeField] private Material m_RedToAlphaMaterial;
 
     //FOV
     private GameObject m_FOVGameObject;
@@ -31,6 +32,8 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
         m_FOVGameObject = CreateView();
         m_FOVCamera = CreateCamera();
         m_FOWMask = CreateMask();
+
+        m_FOWMask.material = m_RedToAlphaMaterial;
 
         int FOVCameraRenderTextureSize = m_PixelsPerWorldUnit * m_FOVCameraSize * 2;
         m_FOVCameraRenderTexture = new RenderTexture(FOVCameraRenderTextureSize, FOVCameraRenderTextureSize, 0);
@@ -71,7 +74,7 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
     void Update()
     {
         // 获取角色的世界坐标
-        var worldPosition = m_FOVGameObject.transform.position;
+        var worldPosition = m_FOVTargetTransform.transform.position;
 
         // 世界坐标转换成RenderTexture坐标, 1世界坐标=16像素
         Vector2Int renderTexturePos = new Vector2Int(

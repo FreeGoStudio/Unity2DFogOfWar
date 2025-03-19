@@ -9,6 +9,7 @@ MonoImporter:
   - m_PlayerViewCameraPrefab: {fileID: 8890663035927380683, guid: c21789d44b7b8f74d910500913522558, type: 3}
   - m_MaskCanvasPrefab: {fileID: 949685438245253250, guid: f4a434a3942216b458cccad7158874db, type: 3}
   - m_FogOfWarAddComputeShader: {fileID: 7200000, guid: 490d593fb1bfb3942b2f0567b571e446, type: 3}
+  - m_RedToAlphaMaterial: {fileID: 2100000, guid: 805033bc95f94444c87a42397c9c9c30, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
