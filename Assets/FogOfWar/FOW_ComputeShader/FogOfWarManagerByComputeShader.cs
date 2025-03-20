@@ -4,7 +4,8 @@ using UnityEngine.UI;
 public class FogOfWarManagerByComputeShader : MonoBehaviour
 {
 
-    [SerializeField] private Transform m_FOVTargetTransform;
+    [SerializeField] private Transform m_TargetTransform;
+
     [SerializeField] private int m_PixelsPerWorldUnit = 16;
     [SerializeField] private int m_FOVCameraSize = 4;
     [SerializeField] private int m_FOWMaskSize = 128;
@@ -17,7 +18,7 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
     [SerializeField] private Material m_RedToAlphaMaterial;
 
     //FOV
-    private GameObject m_FOVGameObject;
+    private GameObject m_PlayerView;
     private Camera m_FOVCamera;
     private RenderTexture m_FOVCameraRenderTexture;
 
@@ -29,8 +30,6 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
 
     private void Awake()
     {
-        m_FOVGameObject = CreateView();
-        m_FOVCamera = CreateCamera();
         m_FOWMask = CreateMask();
 
         m_FOWMask.material = m_RedToAlphaMaterial;
@@ -58,23 +57,27 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
 
         m_FogOfWarAddComputeShader.SetTexture(m_FOVAddFOWCSMainKernelID, "Input", m_FOVCameraRenderTexture);
         m_FogOfWarAddComputeShader.SetTexture(m_FOVAddFOWCSMainKernelID, "Result", m_FOWMaskRenderTexture);
+
+        if (m_TargetTransform != null)
+        {
+            SetTarget(m_TargetTransform);
+        }
     }
 
     void Start()
     {
-        m_FOVCamera.aspect = 1.0f;
-        m_FOVCamera.orthographic = true;
-        m_FOVCamera.orthographicSize = m_FOVCameraSize;
-        m_FOVCamera.targetTexture = m_FOVCameraRenderTexture;
-
-        //m_FOWMask.gameObject.SetActive(true);
         m_FOWMask.texture = m_FOWMaskRenderTexture;
     }
 
     void Update()
     {
+        if (m_TargetTransform == null)
+        {
+            return;
+        }
+
         // 获取角色的世界坐标
-        var worldPosition = m_FOVTargetTransform.transform.position;
+        var worldPosition = m_TargetTransform.transform.position;
 
         // 世界坐标转换成RenderTexture坐标, 1世界坐标=16像素
         Vector2Int renderTexturePos = new Vector2Int(
@@ -91,10 +94,29 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
         m_FogOfWarAddComputeShader.Dispatch(m_FOVAddFOWCSMainKernelID, m_FOVCameraRenderTexture.width / 8, m_FOVCameraRenderTexture.height / 8, 1);
     }
 
+    public void SetTarget(Transform targetTransform)
+    {
+        if (m_FOVCamera != null)
+        {
+            Destroy(m_FOVCamera.gameObject);
+        }
+
+        if (m_PlayerView != null)
+        {
+            Destroy(m_PlayerView);
+        }
+
+        m_TargetTransform = targetTransform;
+
+        m_PlayerView = CreateView();
+        m_FOVCamera = CreateCamera();
+    }
+
     private GameObject CreateView()
     {
         var gameObject = Instantiate(m_PlayerViewPrefab);
-        gameObject.transform.SetParent(m_FOVTargetTransform);
+        gameObject.transform.SetParent(m_TargetTransform);
+        gameObject.transform.localPosition = Vector3.zero;
 
         return gameObject;
     }
@@ -102,8 +124,13 @@ public class FogOfWarManagerByComputeShader : MonoBehaviour
     private Camera CreateCamera()
     {
         var gameObject = Instantiate(m_PlayerViewCameraPrefab);
-        gameObject.transform.SetParent(m_FOVTargetTransform);
+        gameObject.transform.SetParent(m_TargetTransform);
+        gameObject.transform.localPosition = new Vector3(0, 0, -10);
         var component = gameObject.GetComponent<Camera>();
+        component.aspect = 1.0f;
+        component.orthographic = true;
+        component.orthographicSize = m_FOVCameraSize;
+        component.targetTexture = m_FOVCameraRenderTexture;
         return component;
     }
 
